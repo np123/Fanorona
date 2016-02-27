@@ -7,24 +7,34 @@ public class State {
 
 	private static Color turn;	//1 = white, 2 = black
 	public static ArrayList<Piece> pieces = new ArrayList<Piece>();
-	public static int numPieces;
+	public static ArrayList<Piece> capturable = new ArrayList<Piece>();
+	private static int numPieces;
 	public static boolean selected = false;
+	public static boolean capture = false;
 	public static int position;
 	
 	static {
 		turn = Color.WHITE;
 
-		Board currentPosition = new Board();
+		try {
+			Board.class.newInstance();
+			BoardSetup.class.newInstance();
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		initPieces();
-		numPieces = pieces.size();
-		
-		/*for (int x = 0; x < numPieces; x++){
-			System.out.println("x: " + pieces.get(x).getX() + " y: " + pieces.get(x).getY() + " c: " + pieces.get(x).getColor() + " pos: " + pieces.get(x).getPosition());
-		}*/
+		setNumPieces(pieces.size());
 	}
 
 	public static Piece getPiece(int x){
 		return pieces.get(x);
+	}
+	
+	public static boolean getPiece(int x, int y, Color c){
+		for (Piece current : pieces){
+			if (current.getX() == x && current.getY() == y && current.getColor() == c) return true;
+		}
+		return false;
 	}
 	
 	public static void nextTurn(){
@@ -37,13 +47,11 @@ public class State {
 		for (int x = 0; x < 2; x++){
 			for (int y = 0; y < 9; y++){
 				pieces.add(new Piece(x,y,Color.BLACK));
-				//pieces.add(new Piece(5 - x,y,Color.WHITE));
 			}
 		}
 		
 		for (int x = 3; x < 5; x++){
 			for (int y = 0; y < 9; y++){
-				//pieces.add(new Piece(x,y,Color.BLACK));
 				pieces.add(new Piece(x,y,Color.WHITE));
 			}
 		}
@@ -60,6 +68,14 @@ public class State {
 	
 	public static Color getTurn(){
 		return turn;
+	}
+
+	public static int getNumPieces() {
+		return numPieces;
+	}
+
+	public static void setNumPieces(int numPieces) {
+		State.numPieces = numPieces;
 	}
 
 }

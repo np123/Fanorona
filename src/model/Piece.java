@@ -33,25 +33,11 @@ public class Piece {
 	public int getScreenX(){
 		int index = this.getPosition();
 		return Board.nodes[index].getX();
-		
-		/*for (int x = 0; x < 45; x++){
-			if (Board.nodes[x].getPosition() == this.getPosition()){
-				return Board.nodes[x].getX();
-			}
-		}
-		return -1;*/
 	}
 	
 	public int getScreenY(){
 		int index = this.getPosition();
 		return Board.nodes[index].getY();
-		
-		/*for (int x = 0; x < 45; x++){
-			if (Board.nodes[x].getPosition() == this.getPosition()){
-				return Board.nodes[x].getY();
-			}
-		}
-		return -1;*/
 	}
 	
 	public void movePosition(int x, int y){

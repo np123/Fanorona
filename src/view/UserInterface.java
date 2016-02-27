@@ -66,10 +66,6 @@ public class UserInterface extends JPanel {
 			System.out.println("Error: Image files missing from resource");
 			e.printStackTrace();
 		}
-	}	
-	
-	public UserInterface(){
-		
 	}		
 	
 	public static int getHorz(int x){
@@ -101,12 +97,10 @@ public class UserInterface extends JPanel {
 		
 		for (int x = 0; x < horz.length; x++){
 			g2d.drawLine(horz[x], vert[0], horz[x], vert[vert.length-1]);
-		}
-		
+		}		
 		for (int x = 0; x < vert.length; x++){
 			g2d.drawLine(horz[0], vert[x], horz[horz.length-1], vert[x]);
-		}
-		
+		}		
 	}
 	
 	private void drawDiagonals(Graphics g){
@@ -117,8 +111,7 @@ public class UserInterface extends JPanel {
 				if (model.Node.isConnected(model.Board.getNode(x), model.Board.getNode(y))){
 					g2d.drawLine(model.Board.getNode(x).getX(), model.Board.getNode(x).getY(),model.Board.getNode(y).getX(), model.Board.getNode(y).getY());
 				}
-			}
-			
+			}			
 		}
 	}
 	
@@ -141,12 +134,11 @@ public class UserInterface extends JPanel {
 		Color cream = new Color (255,229,204);
 		g2d.setColor(cream);
 		
-		for (int x = 0; x < model.State.numPieces; x++){
+		for (int x = 0; x < model.State.getNumPieces(); x++){
 			if (model.State.getPiece(x).getColor() == Color.BLACK) g2d.setColor(Color.RED);
 			if (model.State.getPiece(x).getColor() == Color.WHITE) g2d.setColor(Color.BLUE);
 			g.fillOval(model.State.getPiece(x).getScreenX() - 25, model.State.getPiece(x).getScreenY() - 25, 50, 50);
-		}
-		
+		}		
 	}
 	
 	private void drawNodes(Graphics g){
@@ -163,8 +155,7 @@ public class UserInterface extends JPanel {
 				
 		for (int x = 0; x < 45; x++){			
 			g.fillOval(model.Board.getNode(x).getX() - 25, model.Board.getNode(x).getY() - 25, 50, 50);
-		}
-		
+		}		
 	}
 	
 	private void drawOutline(Graphics g){
@@ -174,10 +165,7 @@ public class UserInterface extends JPanel {
 				
 		for (int x = 0; x < 45; x++){			
 			g.drawOval(model.Board.getNode(x).getX() - 25, model.Board.getNode(x).getY() - 25, 50, 50);
-		}
-		
-	}
-	
-	
+		}		
+	}		
 	
 }

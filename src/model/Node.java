@@ -9,8 +9,7 @@ public class Node {
 	private final int y;
 	private final int position;
 	
-	public ArrayList<Integer> connections = new ArrayList<Integer>();//Change back to private
-	//private ArrayList<Integer> connections = new ArrayList<Integer>();//Change back to private
+	private ArrayList<Integer> connections = new ArrayList<Integer>();
 	
 	public Node(int x, int y, int position, ArrayList<Integer> joints){
 		this.x = x;
