@@ -11,7 +11,11 @@ public class State {
 	private static int numPieces;
 	public static boolean selected = false;
 	public static boolean capture = false;
-	public static int position;
+	public static int startPosition;
+	public static boolean approachCapture = false;
+	public static boolean withdrawCapture = false;
+	public static boolean grabPiece = false;
+	public static int endPosition;
 	
 	static {
 		turn = Color.WHITE;
@@ -30,10 +34,12 @@ public class State {
 		return pieces.get(x);
 	}
 	
-	public static boolean getPiece(int x, int y, Color c){
+	public static Boolean getPiece(int x, int y, Color c){
 		for (Piece current : pieces){
 			if (current.getX() == x && current.getY() == y && current.getColor() == c) return true;
+			if (current.getX() == x && current.getY() == y && current.getColor() != c) return false;
 		}
+		if (c == null) return true;
 		return false;
 	}
 	

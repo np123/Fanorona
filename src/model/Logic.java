@@ -7,19 +7,55 @@ public class Logic {
 
 	public static void processTurn (int index, int col, int row){
 
+		//Selecting pieces to be taken off the board
+		if (State.grabPiece == true){
+			selectCapture(State.startPosition, State.endPosition, index);
+			makeMove(State.endPosition, State.endPosition%9, State.endPosition/9);
+			return;
+		}
+		
+		//There is a possible capture. Check that the piece selected can make a capture move
+		if (State.capture == true && State.selected == false){
+			for (Piece current : State.pieces){
+				if (current.getPosition() == index && current.getColor() == State.getTurn()){
+					if (checkCapture(current)){
+						State.selected = true;
+						State.startPosition = index;
+						return;
+					}
+				}
+			}
+			return;
+		}
+		
+		//Piece that will be making capture is selected. index is where the piece will end up
+		if (State.capture == true){
+			if (!Node.isConnected(Board.nodes[State.startPosition], Board.nodes[index])) return;
+			if ((State.approachCapture && State.withdrawCapture) == false){
+				if (State.approachCapture) approachCapture(State.startPosition, index);
+				else withdrawCapture(State.startPosition, index);	
+				State.capture = false;
+			} else {
+				System.out.println("PROB");
+				State.grabPiece = true;
+				State.endPosition = index;
+				return;
+			}
+		}
+		
+		//If no capture to be made
 		if (State.selected == true){
 			makeMove(index, col, row);
 			return;
-		}
-
-		if (State.capture == true);
-
+		}		
+		
+		//Selects piece for non-capture move
 		for (int x = 0; x < State.getNumPieces(); x++){
 			Piece current = State.getPiece(x);
 			if (current.getPosition() == index)
 				if (current.getColor() == State.getTurn()){
 					State.selected = true;
-					State.position = index;
+					State.startPosition = index;
 				}
 		}
 
@@ -30,16 +66,16 @@ public class Logic {
 		Piece moving = State.getPiece(0);
 		for (int x = 0; x < State.getNumPieces(); x++){
 			Piece current = State.getPiece(x);
-			if (moving.getPosition() != State.position) moving = State.getPiece(x);				
+			if (moving.getPosition() != State.startPosition) moving = State.getPiece(x);				
 			if (current.getPosition() == index) return;		
 		}
 
-		//captureMade(State.position, index);	//Makes capture
+		//captureMade(State.startPosition, index);	//Makes capture
 
-		if (!Node.isConnected(Board.nodes[State.position], Board.nodes[index])) return;
+		if (!Node.isConnected(Board.nodes[State.startPosition], Board.nodes[index])) return;
 		moving.movePosition(row, col);
 		State.selected = false;
-		State.position = -1;
+		State.startPosition = -1;
 		State.nextTurn();				
 	}
 
@@ -128,26 +164,107 @@ public class Logic {
 	}
 
 
-	private static void selectCapture(int index){
+	private static void selectCapture(int start, int end, int capture){
+		int startCol = start % 9; //left-to-right
+		int startRow = start / 9; //up-down
+		int endCol = end % 9;
+		int endRow = end / 9;
 
+		int selectX = capture % 9;
+		int selectY = capture / 9;
+		
+		int heightDiff = endRow - startRow;
+		int widthDiff = endCol - startCol;
+		
+		for (int x = 0; x < 9; x++){
+			for (int y = 0; y < 5; y++){
+				if (selectX == endRow + x*widthDiff && selectY == endCol + y*heightDiff) {
+					approachCapture(State.startPosition, end);
+					State.selected = false;
+					State.capture = false;
+					State.grabPiece = false;
+					return;
+				}
+				if (selectX == endRow - x*widthDiff && selectY == endCol - y*heightDiff) {
+					withdrawCapture(State.startPosition, end);
+					State.selected = false;
+					State.capture = false;
+					State.grabPiece = false;
+					return;
+				}
+			}
+		}	
 	}
 
-	private static void makeCapture(int index, int col, int row){
-
+	private static boolean checkCapture(Piece current){
+		Color color = current.getColor();
+		int x = current.getX();
+		int y = current.getY();
+		Color opp;
+		
+		int[] found = new int[8];
+		ArrayList<?>[] found1 = new ArrayList<?>[8];
+		for (int i = 0; i < 8; i++) found1[i] = new ArrayList<Node>();
+		
+		//x is Row #, y is Col #
+		
+		//Approach capture
+		for (int i = 0; i < 8; i++) found[i] = 0;
+		for (int disp = 1; disp < 3; disp++){
+			if (disp == 1) opp = null;
+			else{
+				if (color == Color.BLACK) opp = Color.WHITE;
+				else opp = Color.BLACK;
+			}				
+			if (State.getPiece(x + disp, y, opp)) found[0]++;
+			if (State.getPiece(x - disp, y, opp)) found[1]++;
+			if (State.getPiece(x, y + disp, opp)) found[2]++;
+			if (State.getPiece(x, y - disp, opp)) found[3]++;
+			if (State.getPiece(x + disp, y + disp, opp)) found[4]++;
+			if (State.getPiece(x - disp, y - disp, opp)) found[5]++;
+			if (State.getPiece(x + disp, y - disp, opp)) found[6]++;
+			if (State.getPiece(x - disp, y + disp, opp)) found[7]++;				
+		}
+		for (int i = 0; i < 8; i++){
+			if (found[i] == 2){
+				State.approachCapture = true;
+			}
+		}
+		
+		
+		//Withdraw capture
+		for (int i = 0; i < 8; i++) found[i] = 0;
+		for (int disp = -1; disp < 2; disp+=2){
+			if (disp == -1) opp = null;
+			else{
+				if (State.getTurn() == Color.BLACK) opp = Color.WHITE;
+				else opp = Color.BLACK;
+			}				
+			if (State.getPiece(x + disp, y, opp)) found[0]++;
+			if (State.getPiece(x - disp, y, opp)) found[1]++;
+			if (State.getPiece(x, y + disp, opp)) found[2]++;
+			if (State.getPiece(x, y - disp, opp)) found[3]++;
+			if (State.getPiece(x + disp, y + disp, opp)) found[4]++;
+			if (State.getPiece(x - disp, y - disp, opp)) found[5]++;
+			if (State.getPiece(x + disp, y - disp, opp)) found[6]++;
+			if (State.getPiece(x - disp, y + disp, opp)) found[7]++;						
+		}
+		for (int i = 0; i < 8; i++){
+			if (found[i] == 2){
+				State.withdrawCapture = true;
+			}
+		}		
+		return (State.approachCapture == true || State.withdrawCapture == true);			
 	}
-
-	private static void determineCapture(){
-
-	}
-
-
+	
+	
 	/**
 	 * Checks if there are any valid capture moves for the current player
 	 * @return true if capture found, otherwise false
 	 */
-	private static boolean checkCapture(){
+	public static boolean checkCapture(){
 
-		int[] found = new int[6];
+		int[] found = new int[8];
 		Color opp;
 		if (State.getTurn() == Color.BLACK) opp = Color.WHITE;
 		else opp = Color.BLACK;		
@@ -155,21 +272,26 @@ public class Logic {
 		//Approach capture check
 		for (Piece current : State.pieces){
 			if (current.getColor() != State.getTurn()) continue;
-			for (int i = 0; i < 6; i++) found[i] = 0;
-			for (int disp = 0; disp < 2; disp++){
-				if (disp == 0) opp = null;
+			int x = current.getX();
+			int y = current.getY();
+			
+			for (int i = 0; i < 8; i++) found[i] = 0;
+			for (int disp = 1; disp < 3; disp++){
+				if (disp == 1) opp = null;
 				else{
 					if (State.getTurn() == Color.BLACK) opp = Color.WHITE;
 					else opp = Color.BLACK;
 				}				
-				if (State.getPiece(current.getX() + disp, current.getY(), opp)) found[0]++;
-				if (State.getPiece(current.getX() - disp, current.getY(), opp)) found[1]++;
-				if (State.getPiece(current.getX() + disp, current.getY() + disp, opp)) found[2]++;
-				if (State.getPiece(current.getX() - disp, current.getY() - disp, opp)) found[3]++;
-				if (State.getPiece(current.getX() + disp, current.getY() - disp, opp)) found[4]++;
-				if (State.getPiece(current.getX() - disp, current.getY() + disp, opp)) found[5]++;				
+				if (State.getPiece(x + disp, y, opp)) found[0]++;
+				if (State.getPiece(x - disp, y, opp)) found[1]++;
+				if (State.getPiece(x, y + disp, opp)) found[2]++;
+				if (State.getPiece(x, y - disp, opp)) found[3]++;
+				if (State.getPiece(x + disp, y + disp, opp)) found[4]++;
+				if (State.getPiece(x - disp, y - disp, opp)) found[5]++;
+				if (State.getPiece(x + disp, y - disp, opp)) found[6]++;
+				if (State.getPiece(x - disp, y + disp, opp)) found[7]++;			
 			}
-			for (int i = 0; i < 6; i++){
+			for (int i = 0; i < 8; i++){
 				if (found[i] == 2) return true;
 			}
 		}		
@@ -177,21 +299,26 @@ public class Logic {
 		//Withdraw capture check
 		for (Piece current : State.pieces){
 			if (current.getColor() != State.getTurn()) continue;
-			for (int i = 0; i < 6; i++) found[i] = 0;
+			int x = current.getX();
+			int y = current.getY();
+			
+			for (int i = 0; i < 8; i++) found[i] = 0;
 			for (int disp = -1; disp < 2; disp+=2){
 				if (disp == -1) opp = null;
 				else{
 					if (State.getTurn() == Color.BLACK) opp = Color.WHITE;
 					else opp = Color.BLACK;
 				}				
-				if (State.getPiece(current.getX() + disp, current.getY(), opp)) found[0]++;
-				if (State.getPiece(current.getX() - disp, current.getY(), opp)) found[1]++;
-				if (State.getPiece(current.getX() + disp, current.getY() + disp, opp)) found[2]++;
-				if (State.getPiece(current.getX() - disp, current.getY() - disp, opp)) found[3]++;
-				if (State.getPiece(current.getX() + disp, current.getY() - disp, opp)) found[4]++;
-				if (State.getPiece(current.getX() - disp, current.getY() + disp, opp)) found[5]++;				
+				if (State.getPiece(x + disp, y, opp)) found[0]++;
+				if (State.getPiece(x - disp, y, opp)) found[1]++;
+				if (State.getPiece(x, y + disp, opp)) found[2]++;
+				if (State.getPiece(x, y - disp, opp)) found[3]++;
+				if (State.getPiece(x + disp, y + disp, opp)) found[4]++;
+				if (State.getPiece(x - disp, y - disp, opp)) found[5]++;
+				if (State.getPiece(x + disp, y - disp, opp)) found[6]++;
+				if (State.getPiece(x - disp, y + disp, opp)) found[7]++;					
 			}
-			for (int i = 0; i < 6; i++){
+			for (int i = 0; i < 8; i++){
 				if (found[i] == 2) return true;
 			}
 		}

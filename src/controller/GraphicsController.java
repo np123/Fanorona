@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 
+import model.State;
+
 /**
  * The GraphicsController class communicates with the user and
  * reacts to input by calling appropriate methods in the
@@ -60,6 +62,9 @@ public class GraphicsController implements MouseListener{
 		 * Otherwise process the move
 		 * 
 		 * */
+		
+		if (State.selected == false) State.capture = model.Logic.checkCapture();
+		System.out.println("CLICK");
 		
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
