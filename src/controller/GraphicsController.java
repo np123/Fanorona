@@ -11,6 +11,9 @@ import javax.swing.JFrame;
 
 import model.State;
 
+
+import model.Phase;
+
 /**
  * The GraphicsController class communicates with the user and
  * reacts to input by calling appropriate methods in the
@@ -63,27 +66,42 @@ public class GraphicsController implements MouseListener{
 		 * 
 		 * */
 		
-		if (State.selected == false) State.capture = model.Logic.checkCapture();
-		System.out.println("CLICK");
+		Point clicked = new Point(e.getX(), e.getY());
+		int position = -1;
+		
+		for (int x = 0; x < 45; x++){
+			if (model.Board.getNode(x).distanceTo(clicked) < 50){
+				position = x;	
+				break;
+			}
+		}
+		
+		if (position == -1) return;
+		
+		if (State.getCurrentState() == Phase.SELECT){
+			State.setSelected(null);
+			model.Logic.processTurn(position);
+			UI.update();
+		} else if (State.getCurrentState() == Phase.MOVE){
+			model.Logic.makeMove(position);
+			UI.update();
+		} else if (State.getCurrentState() == Phase.CAPTURE){
+			model.Logic.makeCapture(position);
+			UI.update();
+		} else if (State.getCurrentState() == Phase.GRAB){			
+			model.Logic.grabPiece(position);
+			UI.update();
+		}								
 		
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
 			if (model.State.getPiece(i).getColor() == Color.BLACK) black++;
 			else white++;
-		}				
-		
-		Point click = new Point(e.getX(), e.getY());
-		
-		for (int x = 0; x < 45; x++){
-			if (model.Board.getNode(x).distanceTo(click) < 50){
-				model.Logic.processTurn(x, x % 9, x / 9);
-			}
-		}
-		e.consume();
-		UI.update();
+		}	
 		
 		//One side or the other has won
-		if (black == 0 || white == 0){
+		if (black == 0 || white == 0){			
+			UI.update();					//Insert code for displaying a win and/or starting new game
 			System.exit(0);			
 		}
 		
