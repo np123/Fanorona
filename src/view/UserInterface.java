@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 //import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import model.Phase;
 import model.State;
 
 public class UserInterface extends JPanel {
@@ -161,7 +162,8 @@ public class UserInterface extends JPanel {
 	
 	private void drawSelected(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.CYAN);
+		if (model.State.getContinue() == false || model.State.getCurrentState() == Phase.CAPTURE) g2d.setColor(Color.CYAN);
+		else g2d.setColor(Color.LIGHT_GRAY);
 		g2d.setStroke(new BasicStroke(4.0f));
 
 		model.Piece current = State.getSelected();

@@ -21,24 +21,24 @@ import model.Phase;
  *
  */
 public class GraphicsController implements MouseListener{	
-	
+
 	private view.UserInterface UI;
-	
+
 	/**
 	 * Instantiates a GraphicsController and configures the window
 	 */
 	public GraphicsController(){
-		
+
 		//Sets window height and width based on device graphics settings
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
 		int width = (int) gd.getDefaultConfiguration().getBounds().getWidth();
 		int height = (int) gd.getDefaultConfiguration().getBounds().getHeight();
-		
+
 		model.State s = new model.State();
 		view.UserInterface UI = new view.UserInterface();
 		this.UI = UI;
-		
+
 		//Creates new JFrame and sets state to visible
 		JFrame window = new JFrame();
 		window.setSize(width, height);
@@ -49,7 +49,7 @@ public class GraphicsController implements MouseListener{
 		window.setVisible(true);
 	}
 
-	
+
 	/**
 	 * Determines if mouse was clicked while overtop a node
 	 * Calls {@link model.Board#processTurn(int, int, int)} to process event
@@ -58,27 +58,46 @@ public class GraphicsController implements MouseListener{
 	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+
 		/* 
 		 * Map the x and y coordinate of the click to the node
 		 * Ignore if there is no node
 		 * Otherwise process the move
 		 * 
 		 * */
-		
+
 		Point clicked = new Point(e.getX(), e.getY());
 		int position = -1;
-		
+
 		for (int x = 0; x < 45; x++){
 			if (model.Board.getNode(x).distanceTo(clicked) < 50){
 				position = x;	
 				break;
 			}
 		}
-		
+
 		if (position == -1) return;
-		
-		if (State.getCurrentState() == Phase.SELECT){
+
+		Phase current = State.getCurrentState();
+
+		switch (current){
+		case SELECT:
+			model.Logic.processTurn(position);
+			break;
+		case CAPTURE:
+			model.Logic.makeCapture(position);
+			break;
+		case GRAB:
+			model.Logic.grabPiece(position);
+			break;
+		case MOVE:
+			model.Logic.makeMove(position);
+			break;		
+		default:
+			break;
+		}
+		UI.update();
+		/*if (State.getCurrentState() == Phase.SELECT){
 			State.setSelected(null);
 			model.Logic.processTurn(position);
 			UI.update();
@@ -91,20 +110,20 @@ public class GraphicsController implements MouseListener{
 		} else if (State.getCurrentState() == Phase.GRAB){			
 			model.Logic.grabPiece(position);
 			UI.update();
-		}								
-		
+		}*/								
+
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
 			if (model.State.getPiece(i).getColor() == Color.BLACK) black++;
 			else white++;
 		}	
-		
+
 		//One side or the other has won
 		if (black == 0 || white == 0){			
 			UI.update();					//Insert code for displaying a win and/or starting new game
 			System.exit(0);			
 		}
-		
+
 	}
 
 	/* (non-Javadoc)

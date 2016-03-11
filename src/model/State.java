@@ -2,17 +2,23 @@ package model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class State {
 
 	private static Color turn;	//P1 = white, P2 = black
 	private static ArrayList<Piece> pieces = new ArrayList<Piece>();	
+	private static boolean continues = false;
 	private static int numPieces;
 	private static int startPosition;	
+	private static int endPosition; 
 	private static Piece selected;
 	private static Phase currentState = Phase.SELECT;
 	private static ArrayList<Piece> approachCapturable;
 	private static ArrayList<Piece> withdrawCapturable;
+	private static LinkedList<Integer> destination = new LinkedList<Integer>();
+	private static LinkedList<Integer> path = new LinkedList<Integer>();
+	
 	
 	static {
 		turn = Color.WHITE;
@@ -55,6 +61,7 @@ public class State {
 	
 	public static void resetPhase(){
 		setSelected(null);
+		setEndPosition(-1);
 		setStartPosition(-1);
 		setCurrentState(Phase.SELECT);
 	}
@@ -126,6 +133,14 @@ public class State {
 	public static void setStartPosition(int startPosition) {
 		State.startPosition = startPosition;
 	}
+	
+	public static int getEndPosition() {
+		return endPosition;
+	}
+
+	public static void setEndPosition(int startPosition) {
+		State.endPosition = startPosition;
+	}
 
 	public static Phase getCurrentState() {
 		return currentState;
@@ -143,4 +158,40 @@ public class State {
 		State.selected = selected;
 	}
 
+	public static void addToPath(Integer position){
+		path.add(position);
+	}
+	
+	public static boolean pathContains(Integer position){
+		return path.contains(position);
+	}
+	
+	public static void emptyPath(){
+		path = new LinkedList<Integer>();
+	}
+	
+	public static void addDestination(Integer position){
+		destination.add(position);
+	}
+	
+	public static boolean validDestination(Integer position){
+		return destination.contains(position);
+	}
+	
+	public static void emptyTarget(){
+		destination = new LinkedList<Integer>();
+	}
+
+	public static void setContinue(boolean cont) { 
+		continues = cont;
+	}
+	
+	public static boolean getContinue(){
+		return continues;
+	}
+	
+	public static LinkedList<Integer> getPath(){
+		return path;
+	}
+	
 }

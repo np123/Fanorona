@@ -15,12 +15,23 @@ public class Logic {
 	//Third phase:
 	//Highlight the pieces that can be captured
 	//Make user choose the pieces to be removed
+	//Fourth (ongoing) phase:
+	//If possible, give user option to continue capture phase
+	//Keeps path (and direction) on a stack
+	//Exit when no legal continuances or user chooses to end turn
 
 
 	//First phase
 	public static void processTurn(int position){
 
 		if (position == -1) return;
+		if (State.getContinue() == true && position != State.getEndPosition()) {			
+			return;
+		} else if (State.getContinue() == true){
+			State.setStartPosition(State.getEndPosition());
+			//State.setEndPosition(-1);
+		}
+		
 		boolean take = checkCapture();
 		if (take){																			//If there is a capture on the board
 			Piece current = State.getPiece(position/9, position%9, State.getTurn());
@@ -30,7 +41,7 @@ public class Logic {
 				State.setCurrentState(Phase.CAPTURE);
 				State.setStartPosition(position);
 				return;
-			} else{
+			} else{				
 				State.setStartPosition(-1);
 				State.setCurrentState(Phase.SELECT);
 				return;				
@@ -70,13 +81,31 @@ public class Logic {
 
 		int start = State.getStartPosition();		
 
-		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) return;				
+		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) {
+			/*if (State.getContinue() == false) {
+				State.setStartPosition(-1);
+				State.setSelected(null);
+			}*/			
+			State.setCurrentState(Phase.SELECT);
+			return;
+		}
+		if (!State.validDestination(end)) {
+			/*if (State.getContinue() == false) {
+				State.setStartPosition(-1);
+				State.setSelected(null);			
+			}*/
+			State.setCurrentState(Phase.SELECT);
+			return;
+		}
 
 		boolean near = checkApproach(start,end);
 		boolean far = checkWithdraw(start, end);
 		if (near || far) {
 			Piece moving = State.getPiece(start/9, start%9, State.getTurn());
 			moving.movePosition(end/9, end%9);
+			State.setEndPosition(end);
+			State.addToPath(start);										//Marks start position as visited
+			State.addToPath(end);										//Marks end position as visited
 			State.setSelected(null);
 			State.setCurrentState(Phase.GRAB);		
 		}
@@ -90,10 +119,19 @@ public class Logic {
 				if (taken.getPosition() == position){
 					approachCapture();
 					State.setApproachCapturable(null);
-					State.setWithdrawCapturable(null);
-					State.resetPhase();
-					State.nextTurn();
-					return;
+					State.setWithdrawCapturable(null);	
+					int pos = State.getEndPosition();					
+					if (!checkCapture(State.getPiece(pos/9,pos%9,State.getTurn()))){
+						State.setContinue(false);
+						State.resetPhase();
+						State.nextTurn();
+						return;
+					} else {
+						State.setContinue(true);
+						State.setSelected(State.getPiece(pos/9,pos%9,State.getTurn()));
+						State.setCurrentState(Phase.SELECT);
+						return;
+					}
 				}
 			}
 		if (State.getWithdrawCapturable() != null)
@@ -102,14 +140,41 @@ public class Logic {
 					withdrawCapture();
 					State.setApproachCapturable(null);
 					State.setWithdrawCapturable(null);
-					State.resetPhase();
-					State.nextTurn();
-					return;
+					int pos = State.getEndPosition();
+					if (!checkCapture(State.getPiece(pos/9,pos%9,State.getTurn()))){						
+						State.setContinue(false);
+						State.resetPhase();
+						State.nextTurn();
+						return;
+					} else {
+						State.setContinue(true);
+						State.setSelected(State.getPiece(pos/9,pos%9,State.getTurn()));
+						State.setCurrentState(Phase.SELECT);
+						return;
+					}
 				}
 			}
 
 	}
-
+	
+/*	public static void continueCapture(int end){
+		
+		int start = State.getEndPosition();
+		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) return;
+		boolean near = checkApproach(start,end);
+		boolean far = checkWithdraw(start, end);
+		if (near || far) {
+			Piece moving = State.getPiece(start/9, start%9, State.getTurn());
+			moving.movePosition(end/9, end%9);
+			State.setEndPosition(end);
+			State.addToPath(start);										//Marks start position as visited
+			State.addToPath(end);										//Marks end position as visited
+			State.setSelected(null);
+			State.setCurrentState(Phase.GRAB);		
+		}
+		
+	}*/
+	
 	private static void approachCapture(){
 		for (Piece taken : State.getApproachCapturable()){
 			State.getPieces().remove(taken);
@@ -201,7 +266,7 @@ public class Logic {
 		int x = current.getX();						//x is Row #, y is Col #
 		int y = current.getY();
 		Color opp;
-
+		
 		boolean approachCapture = false;
 		boolean withdrawCapture = false;
 		
@@ -230,6 +295,11 @@ public class Logic {
 			if (found1.get(i).size() == 2){
 				for (int j = 1; j < found1.get(i).size();j++) {					
 					if (Node.isConnected(found1.get(i).get(j), found1.get(i).get(j-1))){
+						if (State.pathContains(found1.get(i).get(j-1).getPosition())) {
+							continue;
+						}
+						//System.out.println(found1.get(i).get(j-1).getPosition());
+						State.addDestination(found1.get(i).get(j-1).getPosition());
 						approachCapture = true;
 					}
 				}
@@ -258,14 +328,20 @@ public class Logic {
 		}
 		for (int i = 0; i < 8; i++){			
 			if (found1.get(i).size() == 2){
-				for (int j = 1; j < found1.get(i).size();j++) {
+				for (int j = 1; j < found1.get(i).size();j++) {					
 					if (Node.isConnected(found1.get(i).get(j), Board.getNode(x*9+y)) && Node.isConnected(found1.get(i).get(j-1),Board.getNode(x*9+y))){
+						if (State.pathContains(found1.get(i).get(j).getPosition())) {
+							continue;
+						}
+						//System.out.println(found1.get(i).get(j-1).getPosition());
+						State.addDestination(found1.get(i).get(j-1).getPosition());
 						withdrawCapture = true;
 					}
 				}
 			}
 		}	
-		return (approachCapture == true || withdrawCapture == true);			
+		if (!approachCapture && !withdrawCapture) State.emptyPath();
+		return (approachCapture || withdrawCapture);			
 	}
 
 
