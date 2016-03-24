@@ -64,8 +64,8 @@ public class GraphicsController implements MouseListener{
 		 * Ignore if there is no node
 		 * Otherwise process the move
 		 * 
-		 * */
-
+		 * */	
+		
 		Point clicked = new Point(e.getX(), e.getY());
 		int position = -1;
 
@@ -75,7 +75,7 @@ public class GraphicsController implements MouseListener{
 				break;
 			}
 		}
-
+		
 		if (position == -1) return;
 
 		Phase current = State.getCurrentState();
@@ -96,21 +96,7 @@ public class GraphicsController implements MouseListener{
 		default:
 			break;
 		}
-		UI.update();
-		/*if (State.getCurrentState() == Phase.SELECT){
-			State.setSelected(null);
-			model.Logic.processTurn(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.MOVE){
-			model.Logic.makeMove(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.CAPTURE){
-			model.Logic.makeCapture(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.GRAB){			
-			model.Logic.grabPiece(position);
-			UI.update();
-		}*/								
+		UI.update();								
 
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
