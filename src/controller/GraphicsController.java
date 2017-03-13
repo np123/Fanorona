@@ -7,11 +7,10 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import model.State;
-
-
 import model.Phase;
 
 /**
@@ -21,22 +20,31 @@ import model.Phase;
  *
  */
 public class GraphicsController implements MouseListener{	
-	
+
 	private view.UserInterface UI;
-	
+	private JButton endTurn;
+
 	/**
 	 * Instantiates a GraphicsController and configures the window
 	 */
 	public GraphicsController(){
-		
+
 		//Sets window height and width based on device graphics settings
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
 		int width = (int) gd.getDefaultConfiguration().getBounds().getWidth();
 		int height = (int) gd.getDefaultConfiguration().getBounds().getHeight();
-		
+
 		model.State s = new model.State();
 		view.UserInterface UI = new view.UserInterface();
+		UI.setLayout(new view.Layout());		
+
+		endTurn = new JButton();
+		endTurn.setText("End Turn");
+		endTurn.setName("END");
+		endTurn.setEnabled(false);
+		UI.add(endTurn);
+		
 		this.UI = UI;
 		
 		//Creates new JFrame and sets state to visible
@@ -49,7 +57,7 @@ public class GraphicsController implements MouseListener{
 		window.setVisible(true);
 	}
 
-	
+
 	/**
 	 * Determines if mouse was clicked while overtop a node
 	 * Calls {@link model.Board#processTurn(int, int, int)} to process event
@@ -58,17 +66,24 @@ public class GraphicsController implements MouseListener{
 	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
+
+		// Ends the current players turn
+		if (e.getSource().equals(endTurn)) {
+			State.setContinue(false);
+			State.resetPhase();
+			State.nextTurn();
+		}
 		
 		/* 
 		 * Map the x and y coordinate of the click to the node
 		 * Ignore if there is no node
 		 * Otherwise process the move
 		 * 
-		 * */
+		 * */	
 		
 		Point clicked = new Point(e.getX(), e.getY());
 		int position = -1;
-		
+
 		for (int x = 0; x < 45; x++){
 			if (model.Board.getNode(x).distanceTo(clicked) < 50){
 				position = x;	
@@ -77,34 +92,48 @@ public class GraphicsController implements MouseListener{
 		}
 		
 		if (position == -1) return;
+
+		Phase current = State.getCurrentState();		
 		
-		if (State.getCurrentState() == Phase.SELECT){
-			State.setSelected(null);
+		switch (current){
+		case SELECT:
 			model.Logic.processTurn(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.MOVE){
-			model.Logic.makeMove(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.CAPTURE){
+			break;
+		case CAPTURE:
 			model.Logic.makeCapture(position);
-			UI.update();
-		} else if (State.getCurrentState() == Phase.GRAB){			
+			break;
+		case GRAB:
 			model.Logic.grabPiece(position);
-			UI.update();
-		}								
+			break;
+		case MOVE:
+			model.Logic.makeMove(position);
+			break;		
+		default:
+			break;
+		}
 		
+		/* Allow the current to player to end turn instead
+		 * of continuing his/her capture phase 
+		 */
+		if (State.getContinue() == true)
+			endTurn.setEnabled(true);
+		else
+			endTurn.setEnabled(false);
+		
+		UI.update();								
+
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
 			if (model.State.getPiece(i).getColor() == Color.BLACK) black++;
 			else white++;
 		}	
-		
+
 		//One side or the other has won
 		if (black == 0 || white == 0){			
 			UI.update();					//Insert code for displaying a win and/or starting new game
 			System.exit(0);			
 		}
-		
+
 	}
 
 	/* (non-Javadoc)
