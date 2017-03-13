@@ -7,11 +7,10 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import model.State;
-
-
 import model.Phase;
 
 /**
@@ -23,6 +22,7 @@ import model.Phase;
 public class GraphicsController implements MouseListener{	
 
 	private view.UserInterface UI;
+	private JButton endTurn;
 
 	/**
 	 * Instantiates a GraphicsController and configures the window
@@ -37,8 +37,16 @@ public class GraphicsController implements MouseListener{
 
 		model.State s = new model.State();
 		view.UserInterface UI = new view.UserInterface();
-		this.UI = UI;
+		UI.setLayout(new view.Layout());		
 
+		endTurn = new JButton();
+		endTurn.setText("End Turn");
+		endTurn.setName("END");
+		endTurn.setEnabled(false);
+		UI.add(endTurn);
+		
+		this.UI = UI;
+		
 		//Creates new JFrame and sets state to visible
 		JFrame window = new JFrame();
 		window.setSize(width, height);
@@ -59,6 +67,13 @@ public class GraphicsController implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
+		// Ends the current players turn
+		if (e.getSource().equals(endTurn)) {
+			State.setContinue(false);
+			State.resetPhase();
+			State.nextTurn();
+		}
+		
 		/* 
 		 * Map the x and y coordinate of the click to the node
 		 * Ignore if there is no node
@@ -78,8 +93,8 @@ public class GraphicsController implements MouseListener{
 		
 		if (position == -1) return;
 
-		Phase current = State.getCurrentState();
-
+		Phase current = State.getCurrentState();		
+		
 		switch (current){
 		case SELECT:
 			model.Logic.processTurn(position);
@@ -96,6 +111,15 @@ public class GraphicsController implements MouseListener{
 		default:
 			break;
 		}
+		
+		/* Allow the current to player to end turn instead
+		 * of continuing his/her capture phase 
+		 */
+		if (State.getContinue() == true)
+			endTurn.setEnabled(true);
+		else
+			endTurn.setEnabled(false);
+		
 		UI.update();								
 
 		int black = 0, white = 0;

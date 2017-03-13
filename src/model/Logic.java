@@ -34,7 +34,7 @@ public class Logic {
 		
 		boolean take = checkCapture();
 		if (take){																			//If there is a capture on the board
-			Piece current = State.getPiece(position/9, position%9, State.getTurn());
+			Piece current = State.getPiece(position / 9, position % 9, State.getTurn());
 			if (current == null) return;
 			State.setSelected(current);
 			if (checkCapture(current)){		//If the selected piece can make a capture				
@@ -48,9 +48,9 @@ public class Logic {
 			}			
 		} else {
 			State.setCurrentState(Phase.MOVE);					//No capture on the board
-			State.setSelected(State.getPiece(position/9, position%9, State.getTurn()));
+			State.setSelected(State.getPiece(position / 9, position % 9, State.getTurn()));
 			State.setStartPosition(position);
-		}					
+		}
 	}
 
 
@@ -71,7 +71,7 @@ public class Logic {
 			State.resetPhase();
 			return;
 		}
-		moving.movePosition(position/9, position%9);
+		moving.movePosition(position / 9, position % 9);
 		State.resetPhase();
 		State.nextTurn();
 	}
@@ -101,8 +101,8 @@ public class Logic {
 		boolean near = checkApproach(start,end);
 		boolean far = checkWithdraw(start, end);
 		if (near || far) {
-			Piece moving = State.getPiece(start/9, start%9, State.getTurn());
-			moving.movePosition(end/9, end%9);
+			Piece moving = State.getPiece(start / 9, start % 9, State.getTurn());
+			moving.movePosition(end / 9, end % 9);
 			State.setEndPosition(end);
 			State.addToPath(start);										//Marks start position as visited
 			State.addToPath(end);										//Marks end position as visited
@@ -121,14 +121,14 @@ public class Logic {
 					State.setApproachCapturable(null);
 					State.setWithdrawCapturable(null);	
 					int pos = State.getEndPosition();					
-					if (!checkCapture(State.getPiece(pos/9,pos%9,State.getTurn()))){
+					if (!checkCapture(State.getPiece(pos / 9,pos % 9,State.getTurn()))){
 						State.setContinue(false);
 						State.resetPhase();
 						State.nextTurn();
 						return;
 					} else {
 						State.setContinue(true);
-						State.setSelected(State.getPiece(pos/9,pos%9,State.getTurn()));
+						State.setSelected(State.getPiece(pos / 9,pos % 9,State.getTurn()));
 						State.setCurrentState(Phase.SELECT);
 						return;
 					}
@@ -141,14 +141,14 @@ public class Logic {
 					State.setApproachCapturable(null);
 					State.setWithdrawCapturable(null);
 					int pos = State.getEndPosition();
-					if (!checkCapture(State.getPiece(pos/9,pos%9,State.getTurn()))){						
+					if (!checkCapture(State.getPiece(pos / 9,pos % 9,State.getTurn()))){						
 						State.setContinue(false);
 						State.resetPhase();
 						State.nextTurn();
 						return;
 					} else {
 						State.setContinue(true);
-						State.setSelected(State.getPiece(pos/9,pos%9,State.getTurn()));
+						State.setSelected(State.getPiece(pos / 9,pos % 9,State.getTurn()));
 						State.setCurrentState(Phase.SELECT);
 						return;
 					}
