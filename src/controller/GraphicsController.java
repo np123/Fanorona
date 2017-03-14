@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,7 +19,7 @@ import model.Phase;
  * model and view packages
  *
  */
-public class GraphicsController implements MouseListener{	
+public class GraphicsController extends MouseAdapter {	
 
 	private view.UserInterface UI;
 	private JButton endTurn;
@@ -39,18 +39,18 @@ public class GraphicsController implements MouseListener{
 		view.UserInterface UI = new view.UserInterface();
 		UI.setLayout(new view.Layout());		
 
+		// Button for signaling end of player's turn
 		endTurn = new JButton();
 		endTurn.setText("End Turn");
 		endTurn.setName("END");
 		endTurn.setEnabled(false);
-		UI.add(endTurn);
-		
-		this.UI = UI;
+		UI.add(endTurn);		
 		
 		//Creates new JFrame and sets state to visible
 		JFrame window = new JFrame();
 		window.setSize(width, height);
 		window.add(UI);
+		//this.UI = UI;
 		UI.addMouseListener(this);
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -67,7 +67,10 @@ public class GraphicsController implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
-		// Ends the current players turn
+		/* 
+		 * Ends the current players turn when
+		 * the 'End Turn' button is clicked
+		 */		
 		if (e.getSource().equals(endTurn)) {
 			State.setContinue(false);
 			State.resetPhase();
@@ -79,8 +82,7 @@ public class GraphicsController implements MouseListener{
 		 * Ignore if there is no node
 		 * Otherwise process the move
 		 * 
-		 * */	
-		
+		 */
 		Point clicked = new Point(e.getX(), e.getY());
 		int position = -1;
 
@@ -91,10 +93,11 @@ public class GraphicsController implements MouseListener{
 			}
 		}
 		
+		// Click is not on a valid node on the board
 		if (position == -1) return;
 
-		Phase current = State.getCurrentState();		
-		
+		// Select the action to perform based upon the current state
+		Phase current = State.getCurrentState();				
 		switch (current){
 		case SELECT:
 			model.Logic.processTurn(position);
@@ -112,7 +115,8 @@ public class GraphicsController implements MouseListener{
 			break;
 		}
 		
-		/* Allow the current to player to end turn instead
+		/* 
+		 * Allow the current to player to end turn instead
 		 * of continuing his/her capture phase 
 		 */
 		if (State.getContinue() == true)
@@ -122,49 +126,22 @@ public class GraphicsController implements MouseListener{
 		
 		UI.update();								
 
+		
+		/*
+		 * Count pieces for each side to determine if game has ended
+		 */
 		int black = 0, white = 0;
 		for (int i = 0; i < model.State.getNumPieces(); i++){
 			if (model.State.getPiece(i).getColor() == Color.BLACK) black++;
 			else white++;
 		}	
 
-		//One side or the other has won
+		//True if either side has won
 		if (black == 0 || white == 0){			
 			UI.update();					//Insert code for displaying a win and/or starting new game
-			System.exit(0);			
+			System.exit(0);	
+			//TODO Add proper response to game ended event
 		}
 
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		e.consume();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mouseExited(MouseEvent e) {
-		e.consume();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mousePressed(MouseEvent e) {
-		e.consume();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		e.consume();
 	}	
 }
