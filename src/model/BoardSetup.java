@@ -10,7 +10,7 @@ public class BoardSetup extends Board {
 	static {				
 		for (int x = 0; x < 5; x++) {
 			for (int y = 0; y < 9; y++) {
-				int xpos = view.UserInterface.getHorz(y);
+				int xpos = view.UserInterface.getHorz(y);	//TODO Reduce/remove coupling between model and view
 				int ypos = view.UserInterface.getVert(x);
 				nodes[x*9+y] = new Node(xpos,ypos, x*9+y);
 			}
@@ -18,6 +18,11 @@ public class BoardSetup extends Board {
 		defineConnections();
 	}		
 	
+	
+	/**
+	 * Defines the connectivity of the different
+	 * nodes on the game board as per the game rules
+	 */
 	private static void defineConnections(){
 		for (int x = 0; x < 5; x++){
 			for (int y = 0; y < 9; y++){				
