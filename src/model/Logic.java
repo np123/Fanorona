@@ -6,19 +6,21 @@ import java.util.ArrayList;
 
 public class Logic {
 
-	//First phase: Piece selection
-	//If a capture can be made, make sure appropriate piece is selected
-	//If no capture then select any piece
-	//Second phase: Destination selection
-	//If it was a regular move, then update and end
-	//If move was a capture:
-	//Third phase:
-	//Highlight the pieces that can be captured
-	//Make user choose the pieces to be removed
-	//Fourth (ongoing) phase:
-	//If possible, give user option to continue capture phase
-	//Keeps path (and direction) on a stack
-	//Exit when no legal continuances or user chooses to end turn
+	/*
+	 * First phase: Piece selection
+	 * If a capture can be made, make sure appropriate piece is selected
+	 * If no capture then select any piece
+	 * Second phase: Destination selection
+	 * If it was a regular move, then update and end
+	 * If move was a capture:
+	 * Third phase:
+	 * Highlight the pieces that can be captured
+	 * Make user choose the pieces to be removed
+	 * Fourth (ongoing) phase:
+	 * If possible, give user option to continue capture phase
+	 * Keeps path (and direction) on a stack
+	 * Exit when no legal continuances or user chooses to end turn
+	 */
 
 
 	//First phase
@@ -29,15 +31,19 @@ public class Logic {
 			return;
 		} else if (State.getContinue() == true){
 			State.setStartPosition(State.getEndPosition());
-			//State.setEndPosition(-1);
 		}
 		
 		boolean take = checkCapture();
+		
+		// True when the current player can make a capture on his move
 		if (take){																			//If there is a capture on the board
+			
 			Piece current = State.getPiece(position / 9, position % 9, State.getTurn());
 			if (current == null) return;
 			State.setSelected(current);
-			if (checkCapture(current)){		//If the selected piece can make a capture				
+			
+			// True when the selected piece can make a valid capture
+			if (checkCapture(current)){
 				State.setCurrentState(Phase.CAPTURE);
 				State.setStartPosition(position);
 				return;
@@ -54,9 +60,13 @@ public class Logic {
 	}
 
 
-	//Second phase no capture
+	//Second phase: no capture
 	public static void makeMove(int position){
 
+		/*
+		 * Access the piece to be moved
+		 * Ensure that the destination square is empty
+		 */ 
 		int start = State.getStartPosition();
 		Piece moving = State.getPiece(0);
 		for (int x = 0; x < State.getNumPieces(); x++){
@@ -67,10 +77,14 @@ public class Logic {
 				return;		
 			}
 		}
+		
+		// Ensure starting and destination nodes are adjacent
 		if (!Node.isConnected(Board.getNode(position), Board.getNode(start))){
 			State.resetPhase();
 			return;
 		}
+		
+		// Move the selected piece to its destination position and end current player's turn
 		moving.movePosition(position / 9, position % 9);
 		State.resetPhase();
 		State.nextTurn();
@@ -81,23 +95,19 @@ public class Logic {
 
 		int start = State.getStartPosition();		
 
+		// Ensure starting and destination locations are adjacent
 		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) {
-			/*if (State.getContinue() == false) {
-				State.setStartPosition(-1);
-				State.setSelected(null);
-			}*/			
 			State.setCurrentState(Phase.SELECT);
 			return;
 		}
-		if (!State.validDestination(end)) {
-			/*if (State.getContinue() == false) {
-				State.setStartPosition(-1);
-				State.setSelected(null);			
-			}*/
+		
+		// Ensure the target position is a valid destination node
+		if (!State.validDestination(end)) {			
 			State.setCurrentState(Phase.SELECT);
 			return;
 		}
 
+		// Find and store the set of all pieces available to be captured with the current move
 		boolean near = checkApproach(start,end);
 		boolean far = checkWithdraw(start, end);
 		if (near || far) {
@@ -114,6 +124,7 @@ public class Logic {
 	//Third phase: select pieces to be removed
 	public static void grabPiece(int position){		
 
+		// True when pieces can be captured upon approach
 		if (State.getApproachCapturable() != null)
 			for (Piece taken : State.getApproachCapturable()){
 				if (taken.getPosition() == position){
@@ -134,6 +145,8 @@ public class Logic {
 					}
 				}
 			}
+		
+		// True when pieces can be captured upon withdrawal
 		if (State.getWithdrawCapturable() != null)
 			for (Piece taken : State.getWithdrawCapturable()){
 				if (taken.getPosition() == position){
@@ -157,24 +170,7 @@ public class Logic {
 
 	}
 	
-/*	public static void continueCapture(int end){
-		
-		int start = State.getEndPosition();
-		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) return;
-		boolean near = checkApproach(start,end);
-		boolean far = checkWithdraw(start, end);
-		if (near || far) {
-			Piece moving = State.getPiece(start/9, start%9, State.getTurn());
-			moving.movePosition(end/9, end%9);
-			State.setEndPosition(end);
-			State.addToPath(start);										//Marks start position as visited
-			State.addToPath(end);										//Marks end position as visited
-			State.setSelected(null);
-			State.setCurrentState(Phase.GRAB);		
-		}
-		
-	}*/
-	
+	// Performs a capture by approach, removing the appropriate pieces
 	private static void approachCapture(){
 		for (Piece taken : State.getApproachCapturable()){
 			State.getPieces().remove(taken);
@@ -182,6 +178,7 @@ public class Logic {
 		}
 	}
 
+	// Performs a capture by withdrawal, removing the appropriate pieces
 	private static void withdrawCapture(){
 		for (Piece taken : State.getWithdrawCapturable()){
 			State.getPieces().remove(taken);
@@ -212,8 +209,9 @@ public class Logic {
 			if (x == startRow && y == startCol) continue;
 			boolean madeCapture = false;
 			int location = x*9+y;
-			for (Piece current : State.getPieces()){
-				//Make a list of locations of pieces to be captured
+			
+			//Make a list of locations of pieces to be captured
+			for (Piece current : State.getPieces()){								
 				if (current.getPosition() == location){
 					if (current.getColor() != State.getTurn()) {						
 						approach.add(current);
@@ -229,6 +227,11 @@ public class Logic {
 		return approach.size() > 0;
 	}
 
+	/**
+	 * Checks if a capture by withdrawal can be made
+	 * @param start starting position of piece being moved
+	 * @param end final position of piece being moved 
+	 */
 	private static boolean checkWithdraw(int start, int end){
 		int startCol = start % 9; //left-to-right
 		int startRow = start / 9; //up-down
@@ -298,7 +301,6 @@ public class Logic {
 						if (State.pathContains(found1.get(i).get(j-1).getPosition())) {
 							continue;
 						}
-						//System.out.println(found1.get(i).get(j-1).getPosition());
 						State.addDestination(found1.get(i).get(j-1).getPosition());
 						approachCapture = true;
 					}
@@ -333,7 +335,6 @@ public class Logic {
 						if (State.pathContains(found1.get(i).get(j).getPosition())) {
 							continue;
 						}
-						//System.out.println(found1.get(i).get(j-1).getPosition());
 						State.addDestination(found1.get(i).get(j-1).getPosition());
 						withdrawCapture = true;
 					}
