@@ -9,14 +9,13 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
-/*import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;*/
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-//import javax.swing.JFrame;
+
 import javax.swing.JPanel;
 
 import model.Phase;
