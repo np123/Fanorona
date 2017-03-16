@@ -48,6 +48,10 @@ public class Node {
 		return position;
 	}
 	
+	public Iterable<Integer> getAdjacent(){
+		return connections;
+	}
+	
 	public int distanceTo(Point p){
 		return (int) Math.sqrt(Math.pow(this.getX() - p.getX(), 2) + Math.pow(this.getY() - p.getY(), 2));
 	}

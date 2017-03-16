@@ -33,6 +33,23 @@ public class State {
 		setNumPieces(getPieces().size());
 	}
 
+	public State(){
+		
+	}
+	
+	public State(State original){
+		//this.
+	}
+	
+	public static Piece getPiece(Piece pc){
+		int index;
+		if ((index = pieces.indexOf(pc)) != -1)
+			return pieces.get(index);
+		else
+			return null;
+	}
+	
+	// Based on index not position
 	public static Piece getPiece(int x){
 		return getPieces().get(x);
 	}

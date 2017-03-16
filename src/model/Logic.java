@@ -117,7 +117,7 @@ public class Logic {
 			State.addToPath(start);										//Marks start position as visited
 			State.addToPath(end);										//Marks end position as visited
 			State.setSelected(null);
-			State.setCurrentState(Phase.GRAB);		
+			State.setCurrentState(Phase.GRAB);
 		}
 	}
 
@@ -264,6 +264,8 @@ public class Logic {
 		return withdraw.size() > 0;
 	}
 
+	
+	// Checks for available captures with the given piece, stores the valid destination, if any
 	public static boolean checkCapture(Piece current){
 		Color color = current.getColor();
 		int x = current.getX();						//x is Row #, y is Col #
@@ -274,7 +276,7 @@ public class Logic {
 		boolean withdrawCapture = false;
 		
 		ArrayList<ArrayList<Node>> found1 = new ArrayList<ArrayList<Node>>();
-		for (int i = 0; i < 8; i++) found1.add(new ArrayList<Node>());			
+		for (int i = 0; i < 8; i++) found1.add(new ArrayList<Node>());		
 	
 
 		//Approach capture
