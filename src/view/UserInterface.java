@@ -40,6 +40,8 @@ public class UserInterface extends JPanel {
 	static BufferedImage boardImage = null;
 	static BufferedImage backImage = null;
 	
+	final model.State state;
+	
 	static {	
 	
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -81,6 +83,10 @@ public class UserInterface extends JPanel {
 		return vert[x];
 	}
 	
+	public UserInterface (State state){
+		this.state = state;
+	}
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawBackground(g);
@@ -100,7 +106,7 @@ public class UserInterface extends JPanel {
 	
 	private void drawTurn(Graphics g){
 		String turn;
-		if (State.getTurn() == Color.BLACK) turn = "     RED";
+		if (state.getTurn() == Color.BLACK) turn = "     RED";
 		else turn = "  BLUE";
 		g.setColor(Color.BLACK);
 		g.setFont(font);
@@ -152,38 +158,38 @@ public class UserInterface extends JPanel {
 		Color cream = new Color (255,229,204);
 		g2d.setColor(cream);
 		
-		for (int x = 0; x < model.State.getNumPieces(); x++){
-			if (model.State.getPiece(x).getColor() == Color.BLACK) g2d.setColor(Color.RED);
-			if (model.State.getPiece(x).getColor() == Color.WHITE) g2d.setColor(Color.BLUE);
-			g.fillOval(model.State.getPiece(x).getScreenX() - 25, model.State.getPiece(x).getScreenY() - 25, 50, 50);
+		for (int x = 0; x < state.getNumPieces(); x++){
+			if (state.getPiece(x).getColor() == Color.BLACK) g2d.setColor(Color.RED);
+			if (state.getPiece(x).getColor() == Color.WHITE) g2d.setColor(Color.BLUE);
+			g.fillOval(state.getPiece(x).getScreenX() - 25, state.getPiece(x).getScreenY() - 25, 50, 50);
 		}		
 	}
 	
 	private void drawSelected(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
-		if (model.State.getContinue() == false || model.State.getCurrentState() == Phase.CAPTURE) g2d.setColor(Color.CYAN);
+		if (state.getContinue() == false || state.getCurrentState() == Phase.CAPTURE) g2d.setColor(Color.CYAN);
 		else g2d.setColor(Color.LIGHT_GRAY);
 		g2d.setStroke(new BasicStroke(4.0f));
 
-		model.Piece current = State.getSelected();
+		model.Piece current = state.getSelected();
 		if (current == null) return;
 		g2d.drawOval(current.getScreenX() - 25, current.getScreenY() - 25, 50, 50);
 	}
 	
 	private void drawCaptureLocation(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
-		if (model.State.getApproachCapturable() != null){
-			for (int x = 0; x < model.State.getApproachCapturable().size(); x++){
+		if (state.getApproachCapturable() != null){
+			for (int x = 0; x < state.getApproachCapturable().size(); x++){
 				g2d.setColor(Color.YELLOW);
 				g2d.setStroke(new BasicStroke(4.5f));
-				g2d.drawOval(model.State.getApproachCapturable().get(x).getScreenX() - 25, model.State.getApproachCapturable().get(x).getScreenY() - 25, 50, 50);
+				g2d.drawOval(state.getApproachCapturable().get(x).getScreenX() - 25, state.getApproachCapturable().get(x).getScreenY() - 25, 50, 50);
 			}
 		}		
-		if (model.State.getWithdrawCapturable() != null){
-			for (int x = 0; x < model.State.getWithdrawCapturable().size(); x++){
+		if (state.getWithdrawCapturable() != null){
+			for (int x = 0; x < state.getWithdrawCapturable().size(); x++){
 				g2d.setColor(Color.YELLOW);
 				g2d.setStroke(new BasicStroke(4.5f));
-				g2d.drawOval(model.State.getWithdrawCapturable().get(x).getScreenX() - 25, model.State.getWithdrawCapturable().get(x).getScreenY() - 25, 50, 50);
+				g2d.drawOval(state.getWithdrawCapturable().get(x).getScreenX() - 25, state.getWithdrawCapturable().get(x).getScreenY() - 25, 50, 50);
 			}
 		}
 	}

@@ -6,42 +6,40 @@ import java.util.LinkedList;
 
 public class State {
 
-	private static Color turn;	//P1 = white, P2 = black
-	private static ArrayList<Piece> pieces = new ArrayList<Piece>();	
-	private static boolean continues = false;
-	private static int numPieces;
-	private static int startPosition;	
-	private static int endPosition; 
-	private static Piece selected;
-	private static Phase currentState = Phase.SELECT;
-	private static ArrayList<Piece> approachCapturable;
-	private static ArrayList<Piece> withdrawCapturable;
-	private static LinkedList<Integer> destination = new LinkedList<Integer>();
-	private static LinkedList<Integer> path = new LinkedList<Integer>();
+	private Color turn;	//P1 = white, P2 = black
+	private ArrayList<Piece> pieces = new ArrayList<Piece>();	
+	private boolean continues = false;
+	private int numPieces;
+	private int startPosition;	
+	private int endPosition; 
+	private Piece selected;
+	private Phase currentState = Phase.SELECT;
+	private ArrayList<Piece> approachCapturable;
+	private ArrayList<Piece> withdrawCapturable;
+	private LinkedList<Integer> destination = new LinkedList<Integer>();
+	private LinkedList<Integer> path = new LinkedList<Integer>();
 	
 	
 	static {
-		turn = Color.WHITE;
-
 		try {
 			Board.class.newInstance();
 			BoardSetup.class.newInstance();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		initPieces();
-		setNumPieces(getPieces().size());
 	}
 
 	public State(){
-		
+		turn = Color.WHITE;		
+		initPieces();
+		setNumPieces(getPieces().size());
 	}
 	
 	public State(State original){
 		//this.
 	}
 	
-	public static Piece getPiece(Piece pc){
+	public Piece getPiece(Piece pc){
 		int index;
 		if ((index = pieces.indexOf(pc)) != -1)
 			return pieces.get(index);
@@ -50,20 +48,20 @@ public class State {
 	}
 	
 	// Based on index not position
-	public static Piece getPiece(int x){
-		return getPieces().get(x);
+	public Piece getPiece(int x){
+		return pieces.get(x);
 	}
 	
-	public static Piece getPiece(int x, int y, Color c){
+	public Piece getPiece(int x, int y, Color c){
 		for (Piece current : getPieces()){
 			if (current.getX() == x && current.getY() == y && current.getColor() == c) return current;
 		}
 		return null;
 	}
 	
-	public static Boolean checkPiece(int x, int y, Color c){
+	public Boolean checkPiece(int x, int y, Color c){
 		
-		for (Piece current : getPieces()){			
+		for (Piece current : pieces){			
 			if (current.getX() == x && current.getY() == y && current.getColor() == c) return true;
 			else if (current.getX() == x && current.getY() == y) return false;
 		}		
@@ -71,143 +69,142 @@ public class State {
 		return false;
 	}
 	
-	public static void nextTurn(){
+	public void nextTurn(){
 		if (turn == Color.WHITE) turn = Color.BLACK;
 		else if (turn == Color.BLACK) turn = Color.WHITE;
 	}
 	
-	public static void resetPhase(){
+	public void resetPhase(){
 		setSelected(null);
 		setEndPosition(-1);
 		setStartPosition(-1);
 		setCurrentState(Phase.SELECT);
-	}
+	}	
 	
-	private static void initPieces(){
+	private void initPieces(){
 
 		for (int x = 0; x < 2; x++){
 			for (int y = 0; y < 9; y++){
 				getPieces().add(new Piece(x,y,Color.BLACK));
 			}
-		}
-		
+		}		
 		for (int x = 3; x < 5; x++){
 			for (int y = 0; y < 9; y++){
 				getPieces().add(new Piece(x,y,Color.WHITE));
 			}
 		}
 
-		getPieces().add(new Piece(2,1,Color.BLACK));
-		getPieces().add(new Piece(2,3,Color.BLACK));
-		getPieces().add(new Piece(2,6,Color.BLACK));
-		getPieces().add(new Piece(2,8,Color.BLACK));
-		getPieces().add(new Piece(2,0,Color.WHITE));
-		getPieces().add(new Piece(2,2,Color.WHITE));
-		getPieces().add(new Piece(2,5,Color.WHITE));
-		getPieces().add(new Piece(2,7,Color.WHITE));
+		pieces.add(new Piece(2,1,Color.BLACK));
+		pieces.add(new Piece(2,3,Color.BLACK));
+		pieces.add(new Piece(2,6,Color.BLACK));
+		pieces.add(new Piece(2,8,Color.BLACK));
+		pieces.add(new Piece(2,0,Color.WHITE));
+		pieces.add(new Piece(2,2,Color.WHITE));
+		pieces.add(new Piece(2,5,Color.WHITE));
+		pieces.add(new Piece(2,7,Color.WHITE));
 	}
 	
-	public static Color getTurn(){
+	public Color getTurn(){
 		return turn;
 	}
 
-	public static int getNumPieces() {
+	public int getNumPieces() {
 		return numPieces;
 	}
 
-	public static void setNumPieces(int numPieces) {
-		State.numPieces = numPieces;
+	public void setNumPieces(int numPieces) {
+		this.numPieces = numPieces;
 	}
 
-	public static ArrayList<Piece> getPieces() {
+	public ArrayList<Piece> getPieces() {
 		return pieces;
 	}
 
-	public static void setPieces(ArrayList<Piece> pieces) {
-		State.pieces = pieces;
+	public void setPieces(ArrayList<Piece> pieces) {
+		this.pieces = pieces;
 	}
 
-	public static ArrayList<Piece> getWithdrawCapturable() {
+	public ArrayList<Piece> getWithdrawCapturable() {
 		return withdrawCapturable;
 	}
 
-	public static void setWithdrawCapturable(ArrayList<Piece> withdrawCapturable) {
-		State.withdrawCapturable = withdrawCapturable;
+	public void setWithdrawCapturable(ArrayList<Piece> withdrawCapturable) {
+		this.withdrawCapturable = withdrawCapturable;
 	}
 
-	public static ArrayList<Piece> getApproachCapturable() {
+	public ArrayList<Piece> getApproachCapturable() {
 		return approachCapturable;
 	}
 
-	public static void setApproachCapturable(ArrayList<Piece> approachCapturable) {
-		State.approachCapturable = approachCapturable;
+	public void setApproachCapturable(ArrayList<Piece> approachCapturable) {
+		this.approachCapturable = approachCapturable;
 	}
 
-	public static int getStartPosition() {
+	public int getStartPosition() {
 		return startPosition;
 	}
 
-	public static void setStartPosition(int startPosition) {
-		State.startPosition = startPosition;
+	public void setStartPosition(int startPosition) {
+		this.startPosition = startPosition;
 	}
 	
-	public static int getEndPosition() {
+	public int getEndPosition() {
 		return endPosition;
 	}
 
-	public static void setEndPosition(int startPosition) {
-		State.endPosition = startPosition;
+	public void setEndPosition(int startPosition) {
+		this.endPosition = startPosition;
 	}
 
-	public static Phase getCurrentState() {
+	public Phase getCurrentState() {
 		return currentState;
 	}
 
-	public static void setCurrentState(Phase currentState) {
-		State.currentState = currentState;
+	public void setCurrentState(Phase currentState) {
+		this.currentState = currentState;
 	}
 
-	public static Piece getSelected() {
+	public Piece getSelected() {
 		return selected;
 	}
 
-	public static void setSelected(Piece selected) {
-		State.selected = selected;
+	public void setSelected(Piece selected) {
+		this.selected = selected;
 	}
 
-	public static void addToPath(Integer position){
+	public void addToPath(Integer position){
 		path.add(position);
 	}
 	
-	public static boolean pathContains(Integer position){
+	public boolean pathContains(Integer position){
 		return path.contains(position);
 	}
 	
-	public static void emptyPath(){
+	public void emptyPath(){
 		path = new LinkedList<Integer>();
 	}
 	
-	public static void addDestination(Integer position){
+	public void addDestination(Integer position){
 		destination.add(position);
 	}
 	
-	public static boolean validDestination(Integer position){
+	public boolean validDestination(Integer position){
 		return destination.contains(position);
 	}
 	
-	public static void emptyTarget(){
+	public void emptyTarget(){
 		destination = new LinkedList<Integer>();
 	}
 
-	public static void setContinue(boolean cont) { 
+	public void setContinue(boolean cont) { 
 		continues = cont;
 	}
 	
-	public static boolean getContinue(){
+	public boolean getContinue(){
 		return continues;
-	}
+	}		
 	
-	public static LinkedList<Integer> getPath(){
+	public LinkedList<Integer> getPath(){
 		return path;
 	}
 	

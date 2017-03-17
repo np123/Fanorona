@@ -1,8 +1,13 @@
-package model;
+package controller;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import model.Board;
+import model.Node;
+import model.Piece;
+import model.State;
 
 public class Engine {		
 	
@@ -36,7 +41,8 @@ public class Engine {
 		
 		analyze(current, 0);
 		
-		//assert bestMove != null;
+		assert bestMove != null;
+		System.out.println(bestMove);
 		//bestMove.piece.movingPosition(bestMove.pos.x, bestMove.pos.y);	
 	}
 	
@@ -194,6 +200,11 @@ class Move {
 		return this.id;
 	}
 	
+	@Override
+	public String toString(){
+		return "Start: " + this.start + " , End: " + this.end + " Piece: " + pc.getColor(); 
+	}
+	
 }
 
 
@@ -208,8 +219,7 @@ class CaptureMove extends Move {
 	
 	public Iterable<Piece> getCaptures(){
 		return captures;
-	}
-	
+	}	
 }
 
 

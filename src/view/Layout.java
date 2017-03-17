@@ -3,12 +3,24 @@ package view;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.LayoutManager2;
 
 import javax.swing.JButton;
 
-public class Layout extends UserInterface implements LayoutManager2  {
+public class Layout implements LayoutManager2  {
 
+	final static int windowWidth;
+	final static int windowHeight;
+	
+	static {
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice gd = ge.getDefaultScreenDevice();
+		windowWidth = (int) gd.getDefaultConfiguration().getBounds().getWidth();
+		windowHeight = (int) gd.getDefaultConfiguration().getBounds().getHeight();
+	}
+	
 	@Override
 	public void addLayoutComponent(String arg0, Component arg1) {
 		

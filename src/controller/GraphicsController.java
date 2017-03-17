@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import model.State;
 import model.Phase;
 
 /**
@@ -22,7 +21,8 @@ import model.Phase;
 public class GraphicsController extends MouseAdapter {	
 
 	private view.UserInterface UI;
-	private JButton endTurn;
+	private model.State state;
+	private JButton endTurn;	
 
 	/**
 	 * Instantiates a GraphicsController and configures the window
@@ -35,8 +35,9 @@ public class GraphicsController extends MouseAdapter {
 		int width = (int) gd.getDefaultConfiguration().getBounds().getWidth();
 		int height = (int) gd.getDefaultConfiguration().getBounds().getHeight();
 
-		model.State s = new model.State();
-		view.UserInterface UI = new view.UserInterface();
+		state = new model.State();
+		Logic.setState(state);
+		view.UserInterface UI = new view.UserInterface(state);
 		UI.setLayout(new view.Layout());		
 
 		// Button for signaling end of player's turn
@@ -72,9 +73,9 @@ public class GraphicsController extends MouseAdapter {
 		 * the 'End Turn' button is clicked
 		 */		
 		if (e.getSource().equals(endTurn)) {
-			State.setContinue(false);
-			State.resetPhase();
-			State.nextTurn();
+			state.setContinue(false);
+			state.resetPhase();
+			state.nextTurn();
 		}
 		
 		/* 
@@ -97,19 +98,19 @@ public class GraphicsController extends MouseAdapter {
 		if (position == -1) return;
 
 		// Select the action to perform based upon the current state
-		Phase current = State.getCurrentState();				
+		Phase current = state.getCurrentState();				
 		switch (current){
 		case SELECT:
-			model.Logic.processTurn(position);
+			controller.Logic.processTurn(position);
 			break;
 		case CAPTURE:
-			model.Logic.makeCapture(position);
+			controller.Logic.makeCapture(position);
 			break;
 		case GRAB:
-			model.Logic.grabPiece(position);
+			controller.Logic.grabPiece(position);
 			break;
 		case MOVE:
-			model.Logic.makeMove(position);
+			controller.Logic.makeMove(position);
 			break;		
 		default:
 			break;
@@ -119,7 +120,7 @@ public class GraphicsController extends MouseAdapter {
 		 * Allow the current to player to end turn instead
 		 * of continuing his/her capture phase 
 		 */
-		if (State.getContinue() == true)
+		if (state.getContinue() == true)
 			endTurn.setEnabled(true);
 		else
 			endTurn.setEnabled(false);
@@ -131,8 +132,8 @@ public class GraphicsController extends MouseAdapter {
 		 * Count pieces for each side to determine if game has ended
 		 */
 		int black = 0, white = 0;
-		for (int i = 0; i < model.State.getNumPieces(); i++){
-			if (model.State.getPiece(i).getColor() == Color.BLACK) black++;
+		for (int i = 0; i < state.getNumPieces(); i++){
+			if (state.getPiece(i).getColor() == Color.BLACK) black++;
 			else white++;
 		}	
 
