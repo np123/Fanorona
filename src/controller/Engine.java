@@ -37,7 +37,7 @@ public class Engine {
 	//private static Hashtable<Move, Double> score = new Hashtable<Move, Double>(); 
 	
 	public void makeMove(State original){
-		State current = clone(original); // TODO State.self?
+		State current = clone(original);
 		
 		analyze(current, 0);
 		
@@ -97,8 +97,6 @@ public class Engine {
 		position.getPiece(pc).movePosition(dest % 9, dest / 9);
 	}
 	
-	
-	// TODO change to Position
 	private static double evaluate (State board){
 		return 0.0;
 	}
