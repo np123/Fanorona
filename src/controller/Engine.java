@@ -38,11 +38,12 @@ public class Engine {
 	//Engine.makeMove(state);
 	public static void makeMove(State original){
 		State current = clone(original);
-
+		
 		analyze(current, 0);
 
 		assert bestMove != null;
 		System.out.println("best" + bestMove);
+		original.nextTurn();
 		
 		//bestMove.piece.movingPosition(bestMove.pos.x, bestMove.pos.y);	
 	}
@@ -55,15 +56,15 @@ public class Engine {
 
 	private static double analyze (State board, int depth) {
 
-		//System.out.println("Turn: " + board.getTurn());
+		//if (depth == 0) System.out.println("Turn: " + board.getTurn());
 		Options attackers = possibleCaptures(board);
-
+		
 		// True if no captures can be made
 		if (attackers == null) {			
 			attackers = possibleMoves(board);			
 		}	
-
-		if (depth > 5){
+		
+		if (depth > 1){
 			//score.put(first_move, score.get(first_move) + 2 * evaluate(board));
 			if (depth % 2 == 0) return 2 * evaluate(board, attackers);
 			else return -2 * evaluate(board, attackers);
@@ -75,7 +76,7 @@ public class Engine {
 
 		// Make and evaluate each possible move
 		for (Move mv: attackers.getMoves()){
-			//System.out.println(mv);
+			//if (depth == 0) System.out.println("move " + mv);
 			double total = 0.0;
 			State position = clone(board);
 			if (mv instanceof CaptureMove){
@@ -110,9 +111,8 @@ public class Engine {
 		return (bestScore - worstScore);
 	}
 
-	// TODO Remove pieces if move is a capture move
-	private static void testMove(State position, Piece pc, int dest){				
-		position.getPiece(position.getPieces().indexOf(pc)).movePosition(dest / 9, dest % 9);		
+	private static void testMove(State position, Piece pc, int dest){
+		position.getPiece(position.getPieces().indexOf(pc)).movePosition(dest / 9, dest % 9);
 		position.nextTurn();
 	}
 
@@ -161,10 +161,11 @@ public class Engine {
 		Options moves = new Options(false);
 
 		for (Piece pc: board.getPieces()){
+			if (pc.getColor() != board.getTurn()) continue;
 			Node start = Board.getNode(pc.getPosition());
 
 			for (Integer adj: start.getAdjacent()){
-				if (board.checkPiece(adj % 9, adj / 9, null)){
+				if (board.checkPiece(adj / 9, adj % 9, null)){
 					moves.add(new Move(pc, pc.getPosition(), adj));
 				}
 			}						
@@ -176,9 +177,9 @@ public class Engine {
 
 		Options opts = new Options(true);		
 		Color opp;
-		if (board.getTurn() == Color.WHITE) opp = Color.BLACK;
+		if (board.getTurn().equals(Color.WHITE)) opp = Color.BLACK;
 		else opp = Color.WHITE;
-
+		
 		for (Piece pc: board.getPieces()){
 			//System.out.println(pc + " x: " + pc.getX() + " y: " + pc.getY());			
 			if (pc.getColor() != board.getTurn()) continue;			
@@ -208,7 +209,8 @@ public class Engine {
 				}
 			}
 		}
-		return opts;
+		if (opts.movable.size() > 0 )return opts;
+		else return null;
 	}
 
 }

@@ -46,6 +46,7 @@ public class GraphicsController extends MouseAdapter {
 		endTurn.setName("END");
 		endTurn.setEnabled(false);
 		UI.add(endTurn);		
+		this.UI = UI;
 		
 		//Creates new JFrame and sets state to visible
 		JFrame window = new JFrame();
@@ -54,7 +55,7 @@ public class GraphicsController extends MouseAdapter {
 		UI.addMouseListener(this);
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setVisible(true);	
+		window.setVisible(true);		
 	}
 
 
@@ -74,7 +75,7 @@ public class GraphicsController extends MouseAdapter {
 		if (e.getSource().equals(endTurn)) {
 			state.setContinue(false);
 			state.resetPhase();
-			state.nextTurn();
+			state.nextTurn();	//255,255,255 = blue = white
 		}
 		
 		/* 
@@ -106,7 +107,7 @@ public class GraphicsController extends MouseAdapter {
 			controller.Logic.makeCapture(position);
 			break;
 		case GRAB:
-			controller.Logic.grabPiece(position);
+			controller.Logic.grabPiece(position);			
 			break;
 		case MOVE:
 			controller.Logic.makeMove(position);
@@ -123,7 +124,7 @@ public class GraphicsController extends MouseAdapter {
 			endTurn.setEnabled(true);
 		else
 			endTurn.setEnabled(false);
-		
+				
 		UI.update();								
 
 		
@@ -141,7 +142,11 @@ public class GraphicsController extends MouseAdapter {
 			UI.update();					//Insert code for displaying a win and/or starting new game
 			System.exit(0);	
 			//TODO Add proper response to game ended event
+		}		
+		
+		if (state.getTurn().equals(Color.BLACK)) {
+			Engine.makeMove(state);
+			UI.update();
 		}
-
 	}	
 }
