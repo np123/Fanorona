@@ -32,11 +32,15 @@ public class State {
 	public State(){
 		turn = Color.WHITE;		
 		initPieces();
-		setNumPieces(getPieces().size());
+		setNumPieces(pieces.size());
 	}
 	
 	public State(State original){
-		//this.
+		this.turn = original.turn;
+		this.numPieces = original.numPieces;
+		for (Piece pc: original.getPieces())
+			this.pieces.add(new Piece(pc));
+		assert this.pieces.size() == original.getPieces().size();
 	}
 	
 	public Piece getPiece(Piece pc){
@@ -82,18 +86,18 @@ public class State {
 	}	
 	
 	private void initPieces(){
-
+		
 		for (int x = 0; x < 2; x++){
 			for (int y = 0; y < 9; y++){
-				getPieces().add(new Piece(x,y,Color.BLACK));
+				pieces.add(new Piece(x,y,Color.BLACK));
 			}
 		}		
 		for (int x = 3; x < 5; x++){
 			for (int y = 0; y < 9; y++){
-				getPieces().add(new Piece(x,y,Color.WHITE));
+				pieces.add(new Piece(x,y,Color.WHITE));
 			}
 		}
-
+		
 		pieces.add(new Piece(2,1,Color.BLACK));
 		pieces.add(new Piece(2,3,Color.BLACK));
 		pieces.add(new Piece(2,6,Color.BLACK));
@@ -118,6 +122,10 @@ public class State {
 
 	public ArrayList<Piece> getPieces() {
 		return pieces;
+	}
+	
+	public void removePiece(Piece pc){
+		pieces.remove(pc);
 	}
 
 	public void setPieces(ArrayList<Piece> pieces) {

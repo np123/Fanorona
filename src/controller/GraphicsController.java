@@ -51,11 +51,10 @@ public class GraphicsController extends MouseAdapter {
 		JFrame window = new JFrame();
 		window.setSize(width, height);
 		window.add(UI);
-		//this.UI = UI;
 		UI.addMouseListener(this);
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setVisible(true);
+		window.setVisible(true);	
 	}
 
 
