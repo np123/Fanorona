@@ -34,8 +34,7 @@ public class Engine {
 	 */
 
 	private static Move bestMove;
-	
-	//Engine.makeMove(state);
+		
 	public static void makeMove(State original){
 		State current = clone(original);
 		
@@ -43,9 +42,16 @@ public class Engine {
 
 		assert bestMove != null;
 		System.out.println("best" + bestMove);
-		original.nextTurn();
 		
-		//bestMove.piece.movingPosition(bestMove.pos.x, bestMove.pos.y);	
+		original.getPiece(bestMove.pc).movePosition(bestMove.end / 9, bestMove.end % 9);
+		
+		/*if (bestMove instanceof CaptureMove){
+			for (Piece pc: ((CaptureMove) bestMove).getCaptures()){
+				original.removePiece(pc);
+			}
+		}*/
+		
+		original.nextTurn();	
 	}
 
 	public static State clone(State original){		
