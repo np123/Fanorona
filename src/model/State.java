@@ -83,6 +83,8 @@ public class State {
 		setEndPosition(-1);
 		setStartPosition(-1);
 		setCurrentState(Phase.SELECT);
+		emptyPath();
+		emptyTarget();
 	}	
 	
 	private void initPieces(){

@@ -346,7 +346,7 @@ public class Logic {
 			if (found1.get(i).size() == 2){
 				for (int j = 1; j < found1.get(i).size();j++) {					
 					if (Node.isConnected(found1.get(i).get(j), Board.getNode(x*9+y)) && Node.isConnected(found1.get(i).get(j-1),Board.getNode(x*9+y))){
-						if (state.pathContains(found1.get(i).get(j).getPosition())) {
+						if (state.pathContains(found1.get(i).get(j-1).getPosition())) {
 							continue;
 						}
 						state.addDestination(found1.get(i).get(j-1).getPosition());
