@@ -45,11 +45,12 @@ public class Engine {
 		
 		original.getPiece(bestMove.pc).movePosition(bestMove.end / 9, bestMove.end % 9);
 		
-		/*if (bestMove instanceof CaptureMove){
+		if (bestMove instanceof CaptureMove){
 			for (Piece pc: ((CaptureMove) bestMove).getCaptures()){
 				original.removePiece(pc);
+				original.setNumPieces(original.getNumPieces() - 1);
 			}
-		}*/
+		}
 		
 		original.nextTurn();	
 	}
@@ -70,7 +71,7 @@ public class Engine {
 			attackers = possibleMoves(board);			
 		}	
 		
-		if (depth > 1){
+		if (depth > 3){
 			//score.put(first_move, score.get(first_move) + 2 * evaluate(board));
 			if (depth % 2 == 0) return 2 * evaluate(board, attackers);
 			else return -2 * evaluate(board, attackers);

@@ -106,7 +106,7 @@ public class Logic {
 	public static void makeCapture(int end){
 
 		int start = state.getStartPosition();		
-
+		
 		// Ensure starting and destination locations are adjacent
 		if (!Node.isConnected(Board.getNode(start), Board.getNode(end))) {
 			state.setCurrentState(Phase.SELECT);
@@ -289,7 +289,7 @@ public class Logic {
 		
 		ArrayList<ArrayList<Node>> found1 = new ArrayList<ArrayList<Node>>();
 		for (int i = 0; i < 8; i++) found1.add(new ArrayList<Node>());		
-	
+		
 
 		//Approach capture
 		for (int i = 0; i < 8; i++) found1.set(i, new ArrayList<Node>());
@@ -429,10 +429,9 @@ public class Logic {
 			for (int i = 0; i < 8; i++)
 				if (found1.get(i).size() == 2)
 					for (int j = 1; j < found1.get(i).size();j++)							//Limit to only connected Nodes
-						if (Node.isConnected(found1.get(i).get(j), found1.get(i).get(j-1))) return true;
+						if (Node.isConnected(found1.get(i).get(j), Board.getNode(current.getPosition())) && Node.isConnected(Board.getNode(current.getPosition()),found1.get(i).get(j-1))) return true;
 							
 		}
-					
 		return false;
 	}
 
