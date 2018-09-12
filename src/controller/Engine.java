@@ -50,6 +50,9 @@ public class Engine {
 				original.removePiece(pc);
 				original.setNumPieces(original.getNumPieces() - 1);
 			}
+			if (Logic.checkCapture(bestMove.pc)){
+				
+			}
 		}
 		
 		original.nextTurn();	
@@ -71,7 +74,7 @@ public class Engine {
 			attackers = possibleMoves(board);			
 		}	
 		
-		if (depth > 3){
+		if (depth > 5){
 			//score.put(first_move, score.get(first_move) + 2 * evaluate(board));
 			if (depth % 2 == 0) return 2 * evaluate(board, attackers);
 			else return -2 * evaluate(board, attackers);
